@@ -3,8 +3,7 @@ import parse from "date-fns/parse";
 import identity from "lodash/identity";
 import { DateAttributeGranularity } from "@gooddata/sdk-model";
 import { UnexpectedError } from "@gooddata/sdk-backend-spi";
-
-type ValueTransform = (value: string) => string;
+import { ValueTransform } from "./types";
 
 const granularityParseValueTransformations: {
     [granularity in DateAttributeGranularity]?: ValueTransform;
