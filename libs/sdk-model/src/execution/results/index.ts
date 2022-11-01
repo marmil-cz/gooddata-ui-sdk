@@ -188,6 +188,19 @@ export interface IAttributeDescriptorBody {
      * Describes attributes to which the display form belongs.
      */
     formOf: IAttributeHeaderFormOf;
+
+    /**
+     * Specifies granularity in case of date attribute.
+     */
+    granularity?: string;
+
+    /**
+     * Describes format information in case of date attribute.
+     */
+    format?: {
+        locale: string;
+        pattern: string;
+    };
 }
 
 /**
