@@ -754,6 +754,8 @@ export interface IDateFilterOwnProps extends IDateFilterStatePropsIntersection {
     isTimeForAbsoluteRangeEnabled?: boolean;
     // (undocumented)
     locale?: string;
+    // (undocumented)
+    regionalFormat?: string;
 }
 
 // @public

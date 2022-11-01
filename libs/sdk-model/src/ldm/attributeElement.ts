@@ -25,4 +25,6 @@ export interface IAttributeElement {
      * but for now, if you expect NULLs in your data, treat this as string | null already.
      */
     readonly uri: string;
+
+    readonly formattedTitle?: string;
 }

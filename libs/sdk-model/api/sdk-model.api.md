@@ -508,6 +508,8 @@ export interface IAttributeDisplayFormMetadataObject extends IMetadataObject {
 
 // @public
 export interface IAttributeElement {
+    // (undocumented)
+    readonly formattedTitle?: string;
     readonly title: string;
     readonly uri: string;
 }

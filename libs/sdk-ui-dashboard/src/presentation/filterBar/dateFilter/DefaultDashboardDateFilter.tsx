@@ -53,6 +53,7 @@ export const DefaultDashboardDateFilter = (props: IDashboardDateFilterProps): JS
             customFilterName={config.customFilterName}
             onApply={onApply}
             dateFormat={settings.responsiveUiDateFormat}
+            formatLocale={settings.formatLocale as string}
             locale={locale}
             isTimeForAbsoluteRangeEnabled={!!capabilities.supportsTimeGranularities}
         />

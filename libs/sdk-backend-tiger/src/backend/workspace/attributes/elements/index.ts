@@ -3,6 +3,7 @@ import {
     ElementsRequest,
     FilterByLabelTypeEnum,
     ElementsRequestSortOrderEnum,
+    JsonApiAttributeOutAttributesGranularityEnum,
 } from "@gooddata/api-client-tiger";
 import { InMemoryPaging, ServerPaging } from "@gooddata/sdk-backend-base";
 import {
@@ -26,16 +27,24 @@ import {
     isIdentifierRef,
     ObjRef,
     IAttributeElement,
+    objRefToString,
 } from "@gooddata/sdk-model";
 import invariant from "ts-invariant";
 import { TigerAuthenticatedCallGuard } from "../../../../types";
 import { getRelativeDateFilterShiftedValues } from "./date";
+import { toSdkGranularity } from "../../../../convertors/fromBackend/dateGranularityConversions";
+import { createDateValueFormatter } from "../../../../convertors/fromBackend/dateFormatting/dateValueFormatter";
+import { DateFormatter } from "../../../../convertors/fromBackend/dateFormatting/types";
 
 export class TigerWorkspaceElements implements IElementsQueryFactory {
-    constructor(private readonly authCall: TigerAuthenticatedCallGuard, public readonly workspace: string) {}
+    constructor(
+        private readonly authCall: TigerAuthenticatedCallGuard,
+        public readonly workspace: string,
+        private readonly dateFormatter: DateFormatter,
+    ) {}
 
     public forDisplayForm(ref: ObjRef): IElementsQuery {
-        return new TigerWorkspaceElementsQuery(this.authCall, ref, this.workspace);
+        return new TigerWorkspaceElementsQuery(this.authCall, ref, this.workspace, this.dateFormatter);
     }
 
     public forFilter(filter: FilterWithResolvableElements): IFilterElementsQuery {
@@ -52,6 +61,7 @@ class TigerWorkspaceElementsQuery implements IElementsQuery {
         private readonly authCall: TigerAuthenticatedCallGuard,
         private readonly ref: ObjRef,
         private readonly workspace: string,
+        private readonly dateFormatter: DateFormatter,
     ) {}
 
     public withLimit(limit: number): IElementsQuery {
@@ -130,6 +140,13 @@ class TigerWorkspaceElementsQuery implements IElementsQuery {
         return {};
     }
 
+    private getGranularity(identifier: string) {
+        const parsedGranularity = identifier.substr(identifier.lastIndexOf(".") + 1);
+        return parsedGranularity
+            .replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
+            .toUpperCase() as JsonApiAttributeOutAttributesGranularityEnum;
+    }
+
     private async queryWorker(options: IElementsQueryOptions | undefined): Promise<IElementsQueryResult> {
         const { ref } = this;
         if (!isIdentifierRef(ref)) {
@@ -169,13 +186,23 @@ class TigerWorkspaceElementsQuery implements IElementsQuery {
 
                 const { paging, elements } = response.data;
 
+                const refAsValue = objRefToString(this.ref);
+                const granularity = this.getGranularity(refAsValue);
+                const sdkGranularity = toSdkGranularity(granularity);
+                const dateValueFormatter = createDateValueFormatter(this.dateFormatter);
+                console.log(granularity, sdkGranularity, elements.length);
+
                 return {
-                    items: elements.map(
-                        (element): IAttributeElement => ({
+                    items: elements.map((element): IAttributeElement => {
+                        const objWithFormattedTitle = sdkGranularity
+                            ? { formattedTitle: dateValueFormatter(element.title, sdkGranularity) }
+                            : {};
+                        return {
                             title: element.title,
                             uri: element.primaryTitle ?? element.title,
-                        }),
-                    ),
+                            ...objWithFormattedTitle,
+                        };
+                    }),
                     totalCount: paging.total,
                 };
             },

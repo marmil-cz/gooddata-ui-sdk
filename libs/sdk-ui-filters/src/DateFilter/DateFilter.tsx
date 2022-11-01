@@ -13,7 +13,6 @@ import { canExcludeCurrentPeriod } from "./utils/PeriodExclusion";
 import { DateFilterCore } from "./DateFilterCore";
 import { validateFilterOption } from "./validation/OptionValidation";
 import { DateFilterOption, IDateFilterOptionsByType, isUiRelativeDateFilterForm } from "./interfaces";
-import { DEFAULT_DATE_FORMAT } from "./constants/Platform";
 import { normalizeSelectedFilterOption } from "./utils/FilterOptionNormalization";
 
 /**
@@ -40,6 +39,7 @@ export interface IDateFilterOwnProps extends IDateFilterStatePropsIntersection {
     dateFormat?: string;
     locale?: string;
     isTimeForAbsoluteRangeEnabled?: boolean;
+    formatLocale?: string;
 }
 
 /**
@@ -79,13 +79,13 @@ export interface IDateFilterState extends IDateFilterStatePropsIntersection {
  */
 export class DateFilter extends React.PureComponent<IDateFilterProps, IDateFilterState> {
     public static defaultProps: Partial<IDateFilterProps> = {
-        dateFormat: DEFAULT_DATE_FORMAT,
         isEditMode: false,
         isTimeForAbsoluteRangeEnabled: false,
         locale: "en-US",
         onCancel: noop,
         onOpen: noop,
         onClose: noop,
+        formatLocale: "de-DE",
     };
 
     public static getDerivedStateFromProps(
@@ -166,6 +166,7 @@ export class DateFilter extends React.PureComponent<IDateFilterProps, IDateFilte
             isEditMode,
             locale,
             isTimeForAbsoluteRangeEnabled,
+            formatLocale,
         } = this.props;
         const { excludeCurrentPeriod, selectedFilterOption, isExcludeCurrentPeriodEnabled } = this.state;
         return dateFilterMode === "hidden" ? null : (
@@ -183,6 +184,7 @@ export class DateFilter extends React.PureComponent<IDateFilterProps, IDateFilte
                 selectedFilterOption={selectedFilterOption}
                 originalSelectedFilterOption={originalSelectedFilterOption}
                 locale={locale}
+                formatLocale={formatLocale}
                 onApplyClick={this.handleApplyClick}
                 onCancelClick={this.onCancelClicked}
                 onDropdownOpenChanged={this.onDropdownOpenChanged}

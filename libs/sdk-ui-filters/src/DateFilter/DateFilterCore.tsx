@@ -38,6 +38,7 @@ export interface IDateFilterCoreProps {
 
     isEditMode: boolean;
     locale?: string;
+    formatLocale?: string;
 
     customFilterName?: string;
     disabled?: boolean;
@@ -49,18 +50,42 @@ export interface IDateFilterCoreProps {
     errors?: IExtendedDateFilterErrors;
 }
 
-export const verifyDateFormat = (dateFormat: string): string => {
-    try {
-        // Try to format the current date to verify if dateFormat is a valid format.
-        format(new Date(), dateFormat);
-        return dateFormat;
-    } catch {
-        // If an error occurs, then dateFormat is invalid and the default format should be used instead. Also, a warning is written in the console.
-        // eslint-disable-next-line no-console
-        console.warn(
-            `Unsupported date format ${dateFormat}, the default format ${DEFAULT_DATE_FORMAT} is used instead.`,
-        );
+const LOCALIZED_DATE_FORMATS = {
+    "en-US": "M/d/y",
+    "en-GB": "dd/MM/y",
+    "de-DE": "d.M.y",
+    "es-ES": "d/M/y",
+    "fr-FR": "dd/MM/y",
+    "ja-JP": "y/M/d",
+    "nl-NL": "d-M-y",
+    "pt-BR": "dd/MM/y",
+    "pt-PT": "dd/MM/y",
+    "zh-Hans": "y/M/d",
+    "ru-RU": "dd.MM.y",
+};
+
+export const verifyDateFormat = (dateFormat: string, formatLocale: string): string => {
+    if (!dateFormat && !formatLocale) {
         return DEFAULT_DATE_FORMAT;
+    }
+
+    if (dateFormat) {
+        try {
+            // Try to format the current date to verify if dateFormat is a valid format.
+            format(new Date(), dateFormat);
+            return dateFormat;
+        } catch {
+            // If an error occurs, then dateFormat is invalid and the default format should be used instead. Also, a warning is written in the console.
+            // eslint-disable-next-line no-console
+            console.warn(
+                `Unsupported date format ${dateFormat}, the default format ${DEFAULT_DATE_FORMAT} is used instead.`,
+            );
+            return DEFAULT_DATE_FORMAT;
+        }
+    }
+
+    if (formatLocale) {
+        return LOCALIZED_DATE_FORMATS[formatLocale];
     }
 };
 
@@ -77,9 +102,10 @@ export const DateFilterCore: React.FC<IDateFilterCoreProps> = ({
     locale,
     filterOptions,
     isTimeForAbsoluteRangeEnabled,
+    formatLocale,
     ...dropdownBodyProps
 }) => {
-    const verifiedDateFormat = verifyDateFormat(dateFormat);
+    const verifiedDateFormat = verifyDateFormat(dateFormat, formatLocale);
     const filteredFilterOptions = useMemo(() => {
         return flow(filterVisibleDateFilterOptions, sanitizePresetIntervals)(filterOptions);
     }, [filterOptions]);
