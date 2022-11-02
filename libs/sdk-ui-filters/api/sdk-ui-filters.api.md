@@ -749,13 +749,13 @@ export interface IDateFilterOwnProps extends IDateFilterStatePropsIntersection {
     // (undocumented)
     filterOptions: IDateFilterOptionsByType;
     // (undocumented)
+    formatLocale?: string;
+    // (undocumented)
     isEditMode?: boolean;
     // (undocumented)
     isTimeForAbsoluteRangeEnabled?: boolean;
     // (undocumented)
     locale?: string;
-    // (undocumented)
-    regionalFormat?: string;
 }
 
 // @public

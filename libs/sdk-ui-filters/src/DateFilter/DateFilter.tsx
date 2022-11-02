@@ -85,7 +85,7 @@ export class DateFilter extends React.PureComponent<IDateFilterProps, IDateFilte
         onCancel: noop,
         onOpen: noop,
         onClose: noop,
-        formatLocale: "de-DE",
+        formatLocale: "en-US",
     };
 
     public static getDerivedStateFromProps(

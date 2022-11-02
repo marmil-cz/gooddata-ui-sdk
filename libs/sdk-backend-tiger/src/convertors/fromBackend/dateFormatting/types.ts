@@ -16,3 +16,5 @@ export type DateParseFormatter = (
     locale?: FormattingLocale,
     pattern?: string,
 ) => string;
+
+export type ValueTransform = (value: string) => string;

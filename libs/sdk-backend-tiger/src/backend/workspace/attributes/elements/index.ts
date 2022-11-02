@@ -184,18 +184,26 @@ class TigerWorkspaceElementsQuery implements IElementsQuery {
                     return client.labelElements.computeLabelElementsPost(elementsRequestWrapped);
                 });
 
-                const { paging, elements } = response.data;
+                const { paging, elements, format } = response.data;
 
                 const refAsValue = objRefToString(this.ref);
                 const granularity = this.getGranularity(refAsValue);
                 const sdkGranularity = toSdkGranularity(granularity);
+                const locale = format?.locale as any;
+                const pattern = format?.pattern as any;
                 const dateValueFormatter = createDateValueFormatter(this.dateFormatter);
-                console.log(granularity, sdkGranularity, elements.length);
 
                 return {
                     items: elements.map((element): IAttributeElement => {
                         const objWithFormattedTitle = sdkGranularity
-                            ? { formattedTitle: dateValueFormatter(element.title, sdkGranularity) }
+                            ? {
+                                  formattedTitle: dateValueFormatter(
+                                      element.title,
+                                      sdkGranularity,
+                                      locale,
+                                      pattern,
+                                  ),
+                              }
                             : {};
                         return {
                             title: element.title,

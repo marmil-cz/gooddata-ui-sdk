@@ -544,9 +544,7 @@
                             "PRESTO",
                             "DREMIO",
                             "DRILL",
-                            "GREENPLUM",
-                            "AZURESQL",
-                            "SYNAPSESQL"
+                            "GREENPLUM"
                         ]
                     },
                     "url": {
